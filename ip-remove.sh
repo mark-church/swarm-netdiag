@@ -24,10 +24,14 @@ function init() {
     docker inspect swarm-netdiag
 
     echo "swarm-netdiag container created."
+    docker logs -t swarm-netdiag
 
-	echo "Joining the Swarm cluster ..."
+	echo "SIGHUP to dockerd ..."
 	docker exec -it swarm-netdiag sh -c 'kill -HUP $(pidof dockerd)'
 
+	docker logs -t swarm-netdiag
+
+	echo "Joining the Swarm cluster ..."
 	docker exec -it swarm-netdiag sh -c 'docker swarm join --token $JoinToken $JoinIPPort'
 
 	docker exec -it swarm-netdiag sh -c 'docker info'
@@ -37,6 +41,7 @@ function init() {
 	docker exec -it swarm-netdiag sh -c 'NetworkID=$(docker network ls --no-trunc | grep -i "$NetworkName" | awk '{print $1}')'
 
 	docker exec -it swarm-netdiag sh -c 'curl localhost:2000/joinnetwork?nid=$NetworkID'
+	docker logs -t swarm-netdiag
 
 }
 
