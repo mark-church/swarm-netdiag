@@ -15,22 +15,27 @@ cmd=${1:-""}
 function init() {
     echo "Creating swarm-netdiag container ... "
     docker run --name swarm-netdiag --rm -itd --privileged --network host \
-        --env "RougeIP=$rogueIP" \
-        --env "NetworkName=$networkName" \
-        --env "JoinToken=$joinToken" \
-        --env "JoinIPPort=$joinIPport" \
-        chrch/swarm-netdiag
+    	--env "RougeIP=$rogueIP" \
+    	--env "NetworkName=$networkName" \
+    	--env "JoinToken=$joinToken" \
+    	--env "JoinIPPort=$joinIPport" \
+    	chrch/swarm-netdiag
 
     docker inspect swarm-netdiag
 
     echo "swarm-netdiag container created."
 
-    echo "Joining the Swarm cluster ..."
-    docker exec -it swarm-netdiag sh -c 'kill -HUP $(pidof dockerd)'
+	echo "Joining the Swarm cluster ..."
+	docker exec -it swarm-netdiag sh -c 'kill -HUP $(pidof dockerd)'
 
-    docker exec -it swarm-netdiag sh -c 'docker swarm join --token $JoinToken $JoinIPPort'
+	docker exec -it swarm-netdiag sh -c 'docker swarm join --token $JoinToken $JoinIPPort'
 
-    docker exec -it swarm-netdiag sh -c ''
+	docker exec -it swarm-netdiag sh -c 'docker info'
+
+	docker exec -it swarm-netdiag sh -c 'curl localhost:2000/help'
+
+	docker exec -it swarm-netdiag sh -c 'docker network ls --no-trunc' | grep -i "$networkName"
+
 }
 
 
