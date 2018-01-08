@@ -16,7 +16,7 @@ function init() {
     echo "Creating swarm-netdiag container ... "
     docker run --name swarm-netdiag --rm -itd --privileged --network host \
     	--env "RougeIP=$rogueIP" \
-    	--env "NetworkName=$networkName" \
+    	--env "NetworkID=$networkID" \
     	--env "JoinToken=$joinToken" \
     	--env "JoinIPPort=$joinIPport" \
     	chrch/swarm-netdiag:centos
@@ -27,18 +27,18 @@ function init() {
     docker logs -t swarm-netdiag
 
 	echo "SIGHUP to dockerd ..."
-	docker exec -it swarm-netdiag sh -c 'kill -HUP $(pidof dockerd)'
-
-	docker logs -t swarm-netdiag
+	docker exec -it swarm-netdiag sh -c 'kill -HUP $(ps aux | grep dockerd | grep -v grep | awk -n '\''{print $2}'\'')'
 
 	echo "Joining the Swarm cluster ..."
 	docker exec -it swarm-netdiag sh -c 'docker swarm join --token $JoinToken $JoinIPPort'
 
-	docker exec -it swarm-netdiag sh -c 'docker info'
+	#if [ $(docker exec -it swarm-netdiag sh -c 'curl -s localhost:2000/help | grep "getentry"') ]; then
+	#	echo "found"
+	#else
+	#	echo "not found"
+	#fi
 
-	docker exec -it swarm-netdiag sh -c 'curl localhost:2000/help'
-
-	docker exec -it swarm-netdiag sh -c 'NetworkID=$(docker network ls --no-trunc | grep -i "$NetworkName" | awk '{print $1}')'
+	#docker exec -it swarm-netdiag sh -c 'NetworkID=$(docker network ls --no-trunc | grep -i "$NetworkName" | awk '\''{print $1}'\'')'
 
 	docker exec -it swarm-netdiag sh -c 'curl localhost:2000/joinnetwork?nid=$NetworkID'
 	docker logs -t swarm-netdiag
@@ -52,7 +52,7 @@ function init() {
 if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ]; then
 
     rogueIP=$1
-    networkName=$2
+    networkID=$2
     joinToken=$3
     joinIPport=$4
 
@@ -65,6 +65,6 @@ if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ]; then
 else
     echo "Incorrect usage"
     echo ""
-    echo "Usage:    ./ip-remove.sh <IP-address> <network-name> <swarm-join-token> <swarm-join-IP:port>"
+    echo "Usage:    ./ip-remove.sh <IP-address> <network-id> <swarm-join-token> <swarm-join-IP:port>"
     echo ""
 fi
