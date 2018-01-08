@@ -19,7 +19,7 @@ function init() {
     	--env "NetworkName=$networkName" \
     	--env "JoinToken=$joinToken" \
     	--env "JoinIPPort=$joinIPport" \
-    	chrch/swarm-netdiag
+    	chrch/swarm-netdiag:centos
 
     docker inspect swarm-netdiag
 
@@ -34,7 +34,9 @@ function init() {
 
 	docker exec -it swarm-netdiag sh -c 'curl localhost:2000/help'
 
-	docker exec -it swarm-netdiag sh -c 'docker network ls --no-trunc' | grep -i "$networkName"
+	docker exec -it swarm-netdiag sh -c 'NetworkID=$(docker network ls --no-trunc | grep -i "$NetworkName" | awk '{print $1}')'
+
+	docker exec -it swarm-netdiag sh -c 'curl localhost:2000/joinnetwork?nid=$NetworkID'
 
 }
 
