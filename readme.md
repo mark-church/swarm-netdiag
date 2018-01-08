@@ -2,6 +2,13 @@
 # Swarm NetDiag Instructions
 
 
+## How to use this stuff
+
+- `validate.sh` is a custom script that will validate whether the Swarm VIP pool is consistent with the IPs that the valid tasks should have
+- `ip-remove.sh` is a custom script that will remove an IP address entry from the Swarm network database.
+- The instructions below show how to build the NetDiag container locally and then use it to inspect the Swarm network database
+
+
 ## Building Swarm NetDiag
 
 Building NetDiag requires a few files and scripts to run that are listed in the directory below.
