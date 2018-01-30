@@ -80,7 +80,7 @@ root@docker:/home/ubuntu/bin# docker exec -it swarm-netdiag sh
 sh-4.2#
 sh-4.2# docker -v
 Docker version 17.12.0-ce-rc3, build 80c8033
-sh-4.2# kill -HUP 1
+sh-4.2# kill -HUP $(pidof dockerd)
 ```
 
 Now join the Swarm cluster you are trying to troubleshoot with this node. Use the join-token from your Swarm cluster to do the join.
